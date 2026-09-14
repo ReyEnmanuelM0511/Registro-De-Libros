@@ -7,49 +7,58 @@
 <PageTitle>Agregar Libro</PageTitle>
 
 <div class="p-4 border rounded">
-    <h3>Agregar Libro a la coleccion</h3>
+    <h3>Agregar Libro a la colección</h3>
 
     <div class="mb-3 mt-3">
-        <label>
-            LibroId
-        </label>
-        <Input type="number" class="form-control" @bind="libro.LibroId"/>
+        <label>LibroID</label>
+        <input type="number"
+               class="form-control"
+               @bind="libro.LibroID" />
     </div>
 
     <div class="mb-3">
-        <label>
-            Titulo
-        </label>
-        <Input type="text" class="form-control" @bind="libro.Titulo" />
+        <label>Título</label>
+        <input type="text"
+               class="form-control"
+               @bind="libro.Titulo" />
     </div>
 
     <div class="mb-3">
-        <label>
-            Autor
-        </label>
-        <Input type="text" class="form-control" @bind="libro.Autor"/>
+        <label>Autor</label>
+        <input type="text"
+               class="form-control"
+               @bind="libro.Autor" />
     </div>
 
     <div class="mb-3">
-        <Label>
-            Año de Publicacion
-        </Label>
-        <Input type="text" class="form-control" @bind="libro.AnoPublicacion" />
+        <label>Año de Publicación</label>
+        <input type="text"
+               class="form-control"
+               @bind="libro.AnoPublicacion" />
     </div>
 
-     <div class ="d-flex justify-content-center gap-4">
-        <a href="/IndexLibro" class="btn btn-secondary bi bi-arrow-left mt-5"> Volver</a>
-        <button class="btn btn-primary mt-5 bi bi-save" @onclick="Guardar">Guardar</button>
+    <div class="d-flex justify-content-center gap-4">
+        <a href="/LibrosIndex"
+           class="btn btn-secondary mt-5">
+            Volver
+        </a>
+
+        <button class="btn btn-primary mt-5"
+                @onclick="Guardar">
+            Guardar
+        </button>
     </div>
 </div>
 
-@code{
+@code {
     private Libros libro = new Libros();
 
-    private async Task Guardar() {
+    private async Task Guardar()
+    {
         bool resultado = await librosService.Guardar(libro);
 
-        if(resultado){
+        if (resultado)
+        {
             libro = new Libros();
         }
     }

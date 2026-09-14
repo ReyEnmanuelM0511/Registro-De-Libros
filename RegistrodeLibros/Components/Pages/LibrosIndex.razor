@@ -9,33 +9,116 @@
 <div class="p-3 border rounded">
     <div class="justify-content-between align-items-lg-center d-flex">
         <h3>Listado de Libros</h3>
-        <a href="/crearLibro" class="btn btn-primary"> Agregar Libro</a>
+        <a href="/crearLibro" class="btn btn-primary">
+            Agregar Libro
+        </a>
     </div>
+
+    <div class="mt-3">
+        <div class="d-flex" style="gap: 10px">
+            <label>Filtrar</label>
+            <label>Buscar</label>
+        </div>  
+
+        <div class="row align-items-center">
+            <div class="col-3">
+                <select class="form-select" --@bind="filtroPor">
+                    <option value="" disabled>Selecciona una opcion</option>
+                    <option value="LibroId">LibroId</option>
+                    <option value="Titulo">Titulo</option>
+                    <option value="Autor">Autor</option>
+                    <option value="AnioPublicacion">Año Publicacion</option>
+                </select>
+            </div>
+             <div class="col-4">
+                <div class="input-group">
+                    <input class="form-control" --@bind="filtro" placeholder="Buscar" />
+                    <button type="button" class="btn btn-outline-primary bi bi-search" --@onclick="Buscar"></button>
+                </div>
+            </div>
+        </div>
         
-    <div>
-        <table>
+        <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>LibroId</th>
-                    <th>Titulo</th>
+                    <th>LibroID</th>
+                    <th>Título</th>
                     <th>Autor</th>
-                    <th>AñodePublicacion</th>
+                    <th>Año de Publicación</th>
                 </tr>
             </thead>
 
             <tbody>
-                @foreach(var libro in librosS)
+                @foreach (var libro in libros)
                 {
                     <tr>
-                        <td>@libro.LibroId</td>
+                        <td>@libro.LibroID</td>
                         <td>@libro.Titulo</td>
                         <td>@libro.Autor</td>
-                        <td>@libro.AñodePublicacion</td>
+                        <td>@libro.AnoPublicacion</td>
+                        <td>
+                            <a href="@($"/modificarLibro/{libro.LibroID}")" class="btn btn-primary bi bi-pencil-square" ></a>
+                            <button class="btn btn-danger bi bi-trash" @onclick="() => Eliminar(libro)"></button>
+                        </td>
                     </tr>
                 }
             </tbody>
         </table>
-        
-
     </div>
 </div>
+
+@code {
+    private List<Libros> libros = new List<Libros>();
+    private string filtro{get; set;} = string.Empty;
+    private string filtroPor{get; set;} = string.Empty;
+
+
+    protected override void OnInitialized()
+    {
+        libros = librosS.Listar(l => true);
+    }
+
+    private async Task Eliminar(Libros libro){
+        bool resultado = await librosS.Eliminar(libro.LibroID);
+        if (resultado){
+            libros = librosS.Listar(l => true);
+        }
+        else{
+            return;
+        }
+    }
+
+    private async Task Buscar()
+    {
+        if(filtro == "")
+        {
+            libros = librosS.Listar(l => true);
+        }
+        else if (filtro.Trim() != "" && filtroPor == "Autor")
+        {
+            libros = librosS.Listar(l =>
+                l.Autor.ToLower().Contains(filtro.ToLower()));
+        }
+        else if (filtro.Trim() != "" && filtroPor == "Titulo")
+        {
+            libros = librosS.Listar(l =>
+                l.Titulo.ToLower().Contains(filtro.ToLower()));
+        }
+        else if (filtroPor == "LibroId")
+        {
+            if (int.TryParse(filtro, out int id))
+            {
+                libros = librosS.Listar(l => l.LibroID == id);
+            }
+        }
+        else if (filtroPor == "AnioPublicacion")
+        {
+            if (!string.IsNullOrWhiteSpace(filtro))
+            {
+                var anio = filtro.Trim();
+                libros = librosS.Listar(l => l.AnoPublicacion == anio);
+            }
+        }
+        
+    }
+}
