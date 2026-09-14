@@ -1,6 +1,7 @@
 using RegistrodeLibros.Components;
 using Context;
 using Microsoft.EntityFrameworkCore;
+using Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,8 @@ builder.Services.AddRazorComponents()
 var ConStr = builder.Configuration.GetConnectionString("ConStr");
 
 builder.Services.AddDbContext<Contexto>(o => o.UseSqlite(ConStr));
+
+builder.Services.AddScoped<LibrosServices>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
