@@ -1,0 +1,203 @@
+@page "/modificarLibro/{Id:int}"
+
+@using Models
+@using Services
+
+@inject LibrosServices librosService
+@inject NavigationManager Navigation
+
+@rendermode InteractiveServer
+
+<PageTitle>Modificar Libro</PageTitle>
+
+
+<div class="p-4 border rounded">
+
+    <h3 class="mb-4">
+        Modificar Libro
+    </h3>
+
+
+    @if (libro == null)
+    {
+        <div class="alert alert-warning">
+            Libro no encontrado.
+        </div>
+
+        <a href="/LibrosIndex"
+           class="btn btn-secondary">
+
+            Volver
+
+        </a>
+    }
+    else
+    {
+
+        <!-- LIBRO ID -->
+        <div class="mb-3">
+
+            <label class="form-label">
+                LibroID
+            </label>
+
+            <input type="number"
+                   class="form-control"
+                   value="@libro.LibroID"
+                   disabled />
+
+        </div>
+
+
+        <!-- TITULO -->
+        <div class="mb-3">
+
+            <label class="form-label">
+                Título
+            </label>
+
+            <input type="text"
+                   class="form-control"
+                   @bind="libro.Titulo"
+                   placeholder="Ingrese el título" />
+
+        </div>
+
+
+        <!-- AUTOR -->
+        <div class="mb-3">
+
+            <label class="form-label">
+                Autor
+            </label>
+
+            <input type="text"
+                   class="form-control"
+                   @bind="libro.Autor"
+                   placeholder="Ingrese el autor" />
+
+        </div>
+
+
+        <!-- AÑO -->
+        <div class="mb-3">
+
+            <label class="form-label">
+                Año de Publicación
+            </label>
+
+            <input type="text"
+                   class="form-control"
+                   @bind="libro.AnoPublicacion"
+                   placeholder="Ejemplo: 2026" />
+
+        </div>
+
+
+        <!-- BOTONES -->
+        <div class="d-flex justify-content-center gap-3 mt-4">
+
+            <a href="/LibrosIndex"
+               class="btn btn-secondary">
+
+                Volver
+
+            </a>
+
+
+            <button type="button"
+                    class="btn btn-primary"
+                    @onclick="GuardarCambios">
+
+                Guardar Cambios
+
+            </button>
+
+        </div>
+
+
+        @if (!string.IsNullOrEmpty(mensaje))
+        {
+            <div class="alert @claseMensaje mt-4">
+                @mensaje
+            </div>
+        }
+
+    }
+
+</div>
+
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+
+    private Libros? libro;
+
+    private string mensaje = string.Empty;
+
+    private string claseMensaje = "alert-success";
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        libro = await librosService.Buscar(Id);
+    }
+
+
+    private async Task GuardarCambios()
+    {
+        if (libro == null)
+        {
+            return;
+        }
+
+
+        if (string.IsNullOrWhiteSpace(libro.Titulo))
+        {
+            mensaje = "Debe ingresar el título del libro.";
+
+            claseMensaje = "alert-danger";
+
+            return;
+        }
+
+
+        if (string.IsNullOrWhiteSpace(libro.Autor))
+        {
+            mensaje = "Debe ingresar el autor.";
+
+            claseMensaje = "alert-danger";
+
+            return;
+        }
+
+
+        if (string.IsNullOrWhiteSpace(libro.AnoPublicacion))
+        {
+            mensaje = "Debe ingresar el año de publicación.";
+
+            claseMensaje = "alert-danger";
+
+            return;
+        }
+
+
+        bool resultado = await librosService.Modificar(libro);
+
+
+        if (resultado)
+        {
+            Navigation.NavigateTo("/LibrosIndex");
+        }
+        else
+        {
+            mensaje = "No se pudieron guardar los cambios.";
+
+            claseMensaje = "alert-danger";
+        }
+    }
+
+}
